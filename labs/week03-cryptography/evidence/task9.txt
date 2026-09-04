@@ -1,0 +1,5 @@
+$ ENC_KEY_HEX=... python solution_skeleton.py
+User | 6631503118 | 2026-09-04 16:26:14 SEAST
+argon2 ok: True
+gcm: (b'\xec[\x06\xc6\xce\xc1XJ\xbf\xd3\x81\x7f', b'\x89\xbf\xec\xfeo\x04', b'\xd39\xa7\x07"\x88\x8c\xa0\xbc(:\x04A\xfe\x19\xb2')
+token: 6loysT3wQ_jJ1OMLIBh3KA
