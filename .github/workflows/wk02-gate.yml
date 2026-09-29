@@ -1,0 +1,54 @@
+name: wk02-gate
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  semgrep:
+    name: SAST (Week 2 Semgrep)
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep:latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - name: Scan the Week 2 vulnerable repository
+        run: >-
+          semgrep scan
+          --config p/default
+          --config p/owasp-top-ten
+          --error
+          labs/week02-sdlc-tooling/vulnerable-repo
+
+  trivy:
+    name: SCA (NoteVault Trivy)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - name: Fail on HIGH or CRITICAL findings
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25  # v0.36.0
+        with:
+          scan-type: fs
+          scanners: vuln,secret
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+          limit-severities-for-sarif: true
+          path: project/starter-app
+
+  gitleaks:
+    name: Secret scanning (Week 2 Gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Fail when the Week 2 lab secrets are found
+        run: >-
+          docker run --rm
+          -v "$PWD/labs/week02-sdlc-tooling/vulnerable-repo:/repo"
+          zricethezav/gitleaks:latest
+          detect --no-git --source /repo --exit-code 1 --verbose
